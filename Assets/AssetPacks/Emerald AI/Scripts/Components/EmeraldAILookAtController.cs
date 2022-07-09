@@ -288,7 +288,7 @@ namespace EmeraldAI.Utility
             EmeraldComponent.AIAnimator.SetLookAtWeight(LookWeight, UnityBodyIK, EmeraldComponent.HeadLookWeightCombat, 0.85f);
 
             //Used for Melee AI or AI that don't use aimable weapons. This IK is fully controlled by Unity's IK system. 
-            if (ForceUnityIK || EmeraldComponent.WeaponTypeRef == EmeraldAISystem.WeaponType.Melee || EmeraldComponent.WeaponTypeRef == EmeraldAISystem.WeaponType.Ranged && EmeraldComponent.CombatStateRef == EmeraldAISystem.CombatState.NotActive) //Added Ranged
+            if (ForceUnityIK || EmeraldComponent.WeaponTypeRef == EmeraldAISystem.WeaponType.Melee || EmeraldComponent.WeaponTypeRef == EmeraldAISystem.WeaponType.Ranged && EmeraldComponent.CombatStateRef == EmeraldAISystem.CombatState.NotActive)
             {
                 UnityIKLookPos = Vector3.Lerp(UnityIKLookPos, LerpedLookPosition, Time.deltaTime * 5);
                 EmeraldComponent.AIAnimator.SetLookAtPosition(UnityIKLookPos);

@@ -93,25 +93,46 @@ namespace EmeraldAI.Utility
                     {
                         OddsList.Add(EmeraldComponent.OffensiveAbilities[i].AbilityOdds);
                     }
-                    int OddsIndex = (int)GenerateProbability(OddsList.ToArray());
+                    int OddsIndex = (int)GenerateProbability(OddsList.ToArray());                   
                     EmeraldComponent.m_EmeraldAIAbility = EmeraldComponent.OffensiveAbilities[OddsIndex].OffensiveAbility;
-                    EmeraldComponent.CurrentAnimationIndex = EmeraldComponent.OffensiveAbilities[OddsIndex].AbilityAnimaition;
+                    if (EmeraldComponent.m_EmeraldAIAbility != null)
+                    {
+                        EmeraldComponent.CurrentAnimationIndex = EmeraldComponent.OffensiveAbilities[OddsIndex].AbilityAnimaition;
+                    }
+                    else
+                    {
+                        Debug.LogError("There's a missing Offensive Ability Object in one of the Ability Objects slots of " + EmeraldComponent.name + ". Please go to AI's Settings>Combat>Damage Settings>Abilities and fill in any empty Ability Object slots.");
+                    }
                 }
                 else if (EmeraldComponent.OffensiveAbilityPickType == EmeraldAISystem.OffensiveAbilityPickTypeEnum.Order) //Pick an ability by going through the list in order
                 {
                     EmeraldComponent.m_EmeraldAIAbility = EmeraldComponent.OffensiveAbilities[EmeraldComponent.OffensiveAbilityIndex].OffensiveAbility;
-                    EmeraldComponent.CurrentAnimationIndex = EmeraldComponent.OffensiveAbilities[EmeraldComponent.OffensiveAbilityIndex].AbilityAnimaition;
-                    EmeraldComponent.OffensiveAbilityIndex++;
-                    if (EmeraldComponent.OffensiveAbilityIndex == EmeraldComponent.OffensiveAbilities.Count)
+                    if (EmeraldComponent.m_EmeraldAIAbility != null)
                     {
-                        EmeraldComponent.OffensiveAbilityIndex = 0;
+                        EmeraldComponent.CurrentAnimationIndex = EmeraldComponent.OffensiveAbilities[EmeraldComponent.OffensiveAbilityIndex].AbilityAnimaition;
+                        EmeraldComponent.OffensiveAbilityIndex++;
+                        if (EmeraldComponent.OffensiveAbilityIndex == EmeraldComponent.OffensiveAbilities.Count)
+                        {
+                            EmeraldComponent.OffensiveAbilityIndex = 0;
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("There's a missing Offensive Ability Object in one of the Ability Objects slots of " + EmeraldComponent.name + ". Please go to AI's Settings>Combat>Damage Settings>Abilities and fill in any empty Ability Object slots.");
                     }
                 }
                 else if (EmeraldComponent.OffensiveAbilityPickType == EmeraldAISystem.OffensiveAbilityPickTypeEnum.Random) //Pick a random ability from the list
                 {
                     int RandomIndex = Random.Range(0, EmeraldComponent.OffensiveAbilities.Count);
                     EmeraldComponent.m_EmeraldAIAbility = EmeraldComponent.OffensiveAbilities[RandomIndex].OffensiveAbility;
-                    EmeraldComponent.CurrentAnimationIndex = EmeraldComponent.OffensiveAbilities[RandomIndex].AbilityAnimaition;
+                    if (EmeraldComponent.m_EmeraldAIAbility != null)
+                    {
+                        EmeraldComponent.CurrentAnimationIndex = EmeraldComponent.OffensiveAbilities[RandomIndex].AbilityAnimaition;
+                    }
+                    else
+                    {
+                        Debug.LogError("There's a missing Offensive Ability Object in one of the Ability Objects slots of " + EmeraldComponent.name + ". Please go to AI's Settings>Combat>Damage Settings>Abilities and fill in any empty Ability Object slots.");
+                    }
                 }
             }
         }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace EmeraldAI.Utility
 {
@@ -15,6 +16,7 @@ namespace EmeraldAI.Utility
         [HideInInspector] public PlayerDetectionRef PlayerDetection = PlayerDetectionRef.NotDetected;
         [HideInInspector] public float PlayerDetectionCooldown;
         [HideInInspector] public float DetectionTimer;
+        [HideInInspector] public Collider CurrentTargetCollider;
 
         EmeraldAISystem EmeraldComponent;
         bool AvoidanceTrigger;
@@ -22,7 +24,8 @@ namespace EmeraldAI.Utility
         float AvoidanceSeconds = 1.25f;
         bool m_PlayerDetected = false;
         bool m_FirstTimeDetectingPlayer;
-       
+        bool LineOfSightTargetSet;        
+
         void Start()
         {
             EmeraldComponent = GetComponent<EmeraldAISystem>();
@@ -76,9 +79,10 @@ namespace EmeraldAI.Utility
         //Assigns a target or follower based on the passed parameter and an AI's settings
         public void DetectTarget(GameObject C)
         {
-            if (EmeraldComponent.UseHeadLookRef == EmeraldAISystem.YesOrNo.Yes && C.CompareTag(EmeraldComponent.PlayerTag) && EmeraldComponent.CombatStateRef == EmeraldAISystem.CombatState.NotActive)
+            if (EmeraldComponent.UseHeadLookRef == EmeraldAISystem.YesOrNo.Yes && C.CompareTag(EmeraldComponent.PlayerTag) && 
+                EmeraldComponent.CombatStateRef == EmeraldAISystem.CombatState.NotActive && EmeraldComponent.PlayerFaction[0].RelationTypeRef != EmeraldAISystem.PlayerFactionClass.RelationType.Enemy)
             {
-                EmeraldComponent.LookAtTarget = C.transform;              
+                EmeraldComponent.LookAtTarget = C.transform;
             }
 
             //Tirgger Detection
@@ -205,31 +209,31 @@ namespace EmeraldAI.Utility
             //Line of Sight Detection
             else if (EmeraldComponent.DetectionTypeRef == EmeraldAISystem.DetectionType.LineOfSight && !SearchingForTarget)
             {
-                if (C.CompareTag(EmeraldComponent.PlayerTag) && !EmeraldComponent.LineOfSightTargets.Contains(C.transform) && EmeraldComponent.PlayerFaction[0].RelationTypeRef == EmeraldAISystem.PlayerFactionClass.RelationType.Enemy)
+                if (C.CompareTag(EmeraldComponent.PlayerTag) && !EmeraldComponent.LineOfSightTargets.Contains(C.GetComponent<Collider>()) && EmeraldComponent.PlayerFaction[0].RelationTypeRef == EmeraldAISystem.PlayerFactionClass.RelationType.Enemy)
                 {
                     EmeraldComponent.TargetTypeRef = EmeraldAISystem.TargetType.Player;
                     EmeraldComponent.CurrentDetectionRef = EmeraldAISystem.CurrentDetection.Alert;
-                    EmeraldComponent.LineOfSightTargets.Add(C.transform);
+                    EmeraldComponent.LineOfSightTargets.Add(C.GetComponent<Collider>());
                 }
                 else if (C.CompareTag(EmeraldComponent.EmeraldTag))
                 {
-                    GetTargetFaction(C.transform);
+                    DetectTargetType(C.transform);
 
                     if (EmeraldComponent.AIFactionsList.Contains(EmeraldComponent.ReceivedFaction) && EmeraldComponent.FactionRelations[EmeraldComponent.AIFactionsList.IndexOf(EmeraldComponent.ReceivedFaction)] == 0 
-                        && !EmeraldComponent.LineOfSightTargets.Contains(C.transform))
+                        && !EmeraldComponent.LineOfSightTargets.Contains(C.GetComponent<Collider>()))
                     {
                         EmeraldComponent.CurrentDetectionRef = EmeraldAISystem.CurrentDetection.Alert;
-                        EmeraldComponent.LineOfSightTargets.Add(C.transform);
+                        EmeraldComponent.LineOfSightTargets.Add(C.GetComponent<Collider>());
                     }
                 }
-                else if (C.tag == EmeraldComponent.NonAITag && EmeraldComponent.UseNonAITagRef == EmeraldAISystem.YesOrNo.Yes && !EmeraldComponent.LineOfSightTargets.Contains(C.transform))
+                else if (C.tag == EmeraldComponent.NonAITag && EmeraldComponent.UseNonAITagRef == EmeraldAISystem.YesOrNo.Yes && !EmeraldComponent.LineOfSightTargets.Contains(C.GetComponent<Collider>()))
                 {
                     if (C.GetComponent<EmeraldAISystem>() == null)
                     {
                         EmeraldComponent.TargetTypeRef = EmeraldAISystem.TargetType.NonAITarget;
                     }
                     EmeraldComponent.CurrentDetectionRef = EmeraldAISystem.CurrentDetection.Alert;
-                    EmeraldComponent.LineOfSightTargets.Add(C.transform);
+                    EmeraldComponent.LineOfSightTargets.Add(C.GetComponent<Collider>());
                 }
             }
         }
@@ -384,7 +388,10 @@ namespace EmeraldAI.Utility
                         if (EmeraldComponent.UseHeadLookRef == EmeraldAISystem.YesOrNo.Yes && C.CompareTag(EmeraldComponent.PlayerTag) && EmeraldComponent.CombatStateRef == EmeraldAISystem.CombatState.NotActive && EmeraldComponent.LookAtTarget == null && EmeraldComponent.CurrentTarget == null)
                         {
                             DetectTargetType(C.transform);
-                            EmeraldComponent.LookAtTarget = C.transform;
+
+                            //Only assign the player as the EmeraldComponent.LookAtTarget if they are not an enemy as this feature is intended for non-combat
+                            if (EmeraldComponent.PlayerFaction[0].RelationTypeRef != EmeraldAISystem.PlayerFactionClass.RelationType.Enemy)
+                                EmeraldComponent.LookAtTarget = C.transform;
                         }
                     }
                 }
@@ -395,6 +402,20 @@ namespace EmeraldAI.Utility
                     PlayerDetection = PlayerDetectionRef.NotDetected;
                 }
             }
+
+            if (CurrentTargetCollider == null && EmeraldComponent.CurrentTarget != null)
+            {
+                CurrentTargetCollider = EmeraldComponent.CurrentTarget.GetComponent<Collider>();
+            }
+
+            if (EmeraldComponent.CurrentTargetPositionModifierComp != null)
+            {
+                EmeraldComponent.CurrentPositionModifier = EmeraldComponent.CurrentTargetPositionModifierComp.PositionModifier;
+            }
+            else
+            {
+                EmeraldComponent.CurrentPositionModifier = 0;
+            }
         }
 
         //Calculates our AI's line of sight mechanics.
@@ -404,9 +425,9 @@ namespace EmeraldAI.Utility
         {
             if (EmeraldComponent.CurrentDetectionRef == EmeraldAISystem.CurrentDetection.Alert && EmeraldComponent.CurrentTarget == null && EmeraldComponent.CurrentHealth > 0)
             {
-                foreach (Transform T in EmeraldComponent.LineOfSightTargets.ToArray())
+                foreach (Collider C in EmeraldComponent.LineOfSightTargets.ToArray())
                 {
-                    Vector3 direction = (new Vector3(T.position.x, T.position.y + T.localScale.y / 2, T.position.z)) - EmeraldComponent.HeadTransform.position;
+                    Vector3 direction = C.bounds.center - EmeraldComponent.HeadTransform.position;
                     float angle = Vector3.Angle(new Vector3(direction.x, 0, direction.z), transform.forward);
 
                     if (EmeraldComponent.EnableDebugging == EmeraldAISystem.YesOrNo.Yes && EmeraldComponent.DrawRaycastsEnabled == EmeraldAISystem.YesOrNo.Yes)
@@ -417,18 +438,28 @@ namespace EmeraldAI.Utility
                     if (angle < EmeraldComponent.fieldOfViewAngle * 0.5f)
                     {
                         RaycastHit hit;
-                        if (Physics.Raycast(EmeraldComponent.HeadTransform.position, direction, out hit, EmeraldComponent.DetectionRadius))
+                        if (Physics.Raycast(EmeraldComponent.HeadTransform.position, direction, out hit, EmeraldComponent.DetectionRadius, ~EmeraldComponent.ObstructionDetectionLayerMask))
                         {
                             if (hit.collider.CompareTag(EmeraldComponent.EmeraldTag) || hit.collider.transform.root.CompareTag(EmeraldComponent.EmeraldTag) || hit.collider.CompareTag(EmeraldComponent.PlayerTag) && EmeraldComponent.PlayerFaction[0].RelationTypeRef == EmeraldAISystem.PlayerFactionClass.RelationType.Enemy ||
                                 hit.collider.tag == EmeraldComponent.NonAITag && EmeraldComponent.UseNonAITagRef == EmeraldAISystem.YesOrNo.Yes)
                             {
-                                if (hit.collider != null && EmeraldComponent.LineOfSightTargets.Contains(hit.collider.transform))
+                                if (hit.collider != null && EmeraldComponent.LineOfSightTargets.Contains(hit.collider))
                                 {
                                     if (EmeraldComponent.AIFactionsList.Contains(EmeraldComponent.ReceivedFaction) && EmeraldComponent.FactionRelations[EmeraldComponent.AIFactionsList.IndexOf(EmeraldComponent.ReceivedFaction)] == 0
                                     || hit.collider.CompareTag(EmeraldComponent.PlayerTag) && EmeraldComponent.PlayerFaction[0].RelationTypeRef == EmeraldAISystem.PlayerFactionClass.RelationType.Enemy
                                     || hit.collider.tag == EmeraldComponent.NonAITag && EmeraldComponent.UseNonAITagRef == EmeraldAISystem.YesOrNo.Yes)
                                     {
                                         SetLineOfSightTarget(hit.collider.transform);
+                                        break;
+                                    }
+                                }
+                                else if (hit.collider != null && EmeraldComponent.LineOfSightTargets.Contains(hit.collider.transform.root.GetComponent<Collider>()))
+                                {
+                                    if (EmeraldComponent.AIFactionsList.Contains(EmeraldComponent.ReceivedFaction) && EmeraldComponent.FactionRelations[EmeraldComponent.AIFactionsList.IndexOf(EmeraldComponent.ReceivedFaction)] == 0
+                                    || hit.collider.transform.root.CompareTag(EmeraldComponent.PlayerTag) && EmeraldComponent.PlayerFaction[0].RelationTypeRef == EmeraldAISystem.PlayerFactionClass.RelationType.Enemy
+                                    || hit.collider.transform.root.tag == EmeraldComponent.NonAITag && EmeraldComponent.UseNonAITagRef == EmeraldAISystem.YesOrNo.Yes)
+                                    {
+                                        SetLineOfSightTarget(hit.collider.transform.root);
                                         break;
                                     }
                                 }
@@ -605,7 +636,7 @@ namespace EmeraldAI.Utility
 
             foreach (Collider C in EmeraldComponent.CollidersInArea)
             {
-                if (C.gameObject != this.gameObject && !EmeraldComponent.LineOfSightTargets.Contains(C.transform) && !EmeraldAISystem.IgnoredTargetsList.Contains(C.transform))
+                if (C.gameObject != this.gameObject && !EmeraldComponent.LineOfSightTargets.Contains(C.GetComponent<Collider>()) && !EmeraldAISystem.IgnoredTargetsList.Contains(C.transform))
                 {
                     if (C.gameObject.GetComponent<EmeraldAISystem>() != null)
                     {
@@ -614,26 +645,31 @@ namespace EmeraldAI.Utility
                             EmeraldComponent.FactionRelations[EmeraldComponent.AIFactionsList.IndexOf(EmeraldRef.CurrentFaction)] == 0 &&
                             EmeraldComponent.BehaviorRef != EmeraldAISystem.CurrentBehavior.Companion)
                         {
-                            EmeraldComponent.LineOfSightTargets.Add(C.transform);
+                            EmeraldComponent.LineOfSightTargets.Add(C.GetComponent<Collider>());
                         }
                         else if (EmeraldComponent.AIFactionsList.Contains(EmeraldRef.CurrentFaction) &&
                             EmeraldComponent.FactionRelations[EmeraldComponent.AIFactionsList.IndexOf(EmeraldRef.CurrentFaction)] == 0 &&
                             EmeraldComponent.BehaviorRef == EmeraldAISystem.CurrentBehavior.Companion && EmeraldRef.CombatStateRef == EmeraldAISystem.CombatState.Active)
                         {
-                            EmeraldComponent.LineOfSightTargets.Add(C.transform);
+                            EmeraldComponent.LineOfSightTargets.Add(C.GetComponent<Collider>());
                         }
                     }
                     else if (C.gameObject.CompareTag(EmeraldComponent.PlayerTag) && EmeraldComponent.PlayerFaction[0].RelationTypeRef == EmeraldAISystem.PlayerFactionClass.RelationType.Enemy)
                     {
                         if (EmeraldComponent.BehaviorRef != EmeraldAISystem.CurrentBehavior.Companion || EmeraldComponent.BehaviorRef == EmeraldAISystem.CurrentBehavior.Companion && C.gameObject.transform != EmeraldComponent.CurrentFollowTarget)
                         {
-                            EmeraldComponent.LineOfSightTargets.Add(C.transform);
+                            EmeraldComponent.LineOfSightTargets.Add(C.GetComponent<Collider>());
                         }
                     }
                     else if (C.gameObject.tag == EmeraldComponent.NonAITag && EmeraldComponent.UseNonAITagRef == EmeraldAISystem.YesOrNo.Yes)
                     {
-                        EmeraldComponent.LineOfSightTargets.Add(C.transform);
+                        EmeraldComponent.LineOfSightTargets.Add(C.GetComponent<Collider>());
                     }
+                }
+
+                if (!EmeraldComponent.LineOfSightTargets.Contains(C.GetComponent<Collider>()))
+                {
+                    EmeraldComponent.LineOfSightTargets.Remove(C.GetComponent<Collider>());
                 }
             }
         }
@@ -731,35 +767,16 @@ namespace EmeraldAI.Utility
                     EmeraldComponent.DeathDelayActive = true;
             }
 
-            float previousDistance = Mathf.Infinity;
-            float currentDistance;
-            Transform TempTarget = null;
-
-            foreach (GameObject target in EmeraldComponent.potentialTargets.ToArray())
+            Transform ClosestTarget = null;
+            var OrderedTargets = EmeraldComponent.potentialTargets.OrderBy(x => Vector3.Distance(transform.position, x.transform.position)).ToList();
+            if (OrderedTargets.Count > 0)
             {
-                if (!SearchForRandomTarget && target != null)
-                {
-                    if (EmeraldComponent.BehaviorRef != EmeraldAISystem.CurrentBehavior.Companion)
-                    {
-                        EmeraldComponent.distanceBetween = target.transform.position - transform.position;
-                    }
-                    else if (EmeraldComponent.BehaviorRef == EmeraldAISystem.CurrentBehavior.Companion && EmeraldComponent.CurrentFollowTarget != null)
-                    {
-                        EmeraldComponent.distanceBetween = target.transform.position - EmeraldComponent.CurrentFollowTarget.position;
-                    }
-                    currentDistance = EmeraldComponent.distanceBetween.sqrMagnitude;
-
-                    if (currentDistance < previousDistance)
-                    {
-                        TempTarget = target.transform;
-                        previousDistance = currentDistance;                        
-                    }
-                }
+                ClosestTarget = OrderedTargets[0].transform;
             }
 
-            if (TempTarget != null && TempTarget != EmeraldComponent.CurrentTarget)
+            if (ClosestTarget != null && ClosestTarget != EmeraldComponent.CurrentTarget)
             {
-                SetDetectedTarget(TempTarget);
+                SetDetectedTarget(ClosestTarget);
             }
         }
 

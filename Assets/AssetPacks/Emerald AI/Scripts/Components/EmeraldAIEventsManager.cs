@@ -179,7 +179,7 @@ namespace EmeraldAI
                 else
                 {
                     EmeraldComponent.m_EventAudioSource.volume = EmeraldComponent.BlockVolume;
-                    EmeraldComponent.m_AudioSource.pitch = Mathf.Round(Random.Range(0.7f, 1.1f) * 10) / 10; //Edited
+                    EmeraldComponent.m_AudioSource.pitch = Mathf.Round(Random.Range(0.7f, 1.1f) * 10) / 10;
                     EmeraldComponent.m_EventAudioSource.PlayOneShot(EmeraldComponent.BlockingSounds[Random.Range(0, EmeraldComponent.BlockingSounds.Count)]);
                 }
             }
@@ -530,10 +530,8 @@ namespace EmeraldAI
         /// </summary>
         public void CancelAttackAnimation ()
         {
-            if (gameObject.name == "Forest Golem_2_PA (2)")
-            Debug.Log("Cancelled");
             EmeraldComponent.IsRunAttack = false;
-            EmeraldComponent.AttackTimer = 0; //Edited - Was -1
+            EmeraldComponent.AttackTimer = 0;
             EmeraldComponent.AIAnimator.ResetTrigger("Attack");
             EmeraldComponent.AIAnimator.SetTrigger("Attack Cancelled");
             EmeraldComponent.AIAnimator.ResetTrigger("Attack Cancelled");
@@ -721,7 +719,6 @@ namespace EmeraldAI
         /// </summary>
         public void CreateDroppableWeapon()
         {
-            //Edited - Removed weapon type requirement and made it so the weapon in hand just needs to be active.
             //If using one weapon type, use either the 
             if (EmeraldComponent.UseDroppableWeapon == EmeraldAISystem.YesOrNo.Yes)
             {
@@ -741,8 +738,9 @@ namespace EmeraldAI
 
                         //Apply the AI's current velocity to the weapon object.
                         Rigidbody WeapnRigidbody = EmeraldComponent.DroppableMeleeWeapon.GetComponent<Rigidbody>();
+                        WeapnRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
 
-                        if (EmeraldComponent.EmeraldEventsManagerComponent.GetAttacker() != EmeraldComponent.CurrentTarget)
+                        if (EmeraldComponent.EmeraldEventsManagerComponent.GetAttacker() != null && EmeraldComponent.EmeraldEventsManagerComponent.GetAttacker() != EmeraldComponent.CurrentTarget)
                             WeapnRigidbody.AddForce((EmeraldComponent.EmeraldEventsManagerComponent.GetAttacker().position - transform.position).normalized * -EmeraldComponent.ReceivedRagdollForceAmount, ForceMode.Impulse);
                         else
                             WeapnRigidbody.AddForce((EmeraldComponent.CurrentTarget.position - transform.position).normalized * -EmeraldComponent.ReceivedRagdollForceAmount, ForceMode.Impulse);
@@ -770,7 +768,7 @@ namespace EmeraldAI
                         //Apply the AI's current velocity to the weapon object.
                         Rigidbody WeapnRigidbody = EmeraldComponent.DroppableRangedWeapon.GetComponent<Rigidbody>();
 
-                        if (EmeraldComponent.EmeraldEventsManagerComponent.GetAttacker() != EmeraldComponent.CurrentTarget)
+                        if (EmeraldComponent.EmeraldEventsManagerComponent.GetAttacker() != null && EmeraldComponent.EmeraldEventsManagerComponent.GetAttacker() != EmeraldComponent.CurrentTarget)
                             WeapnRigidbody.AddForce((EmeraldComponent.EmeraldEventsManagerComponent.GetAttacker().position - transform.position).normalized * -EmeraldComponent.ReceivedRagdollForceAmount, ForceMode.Impulse);
                         else
                             WeapnRigidbody.AddForce((EmeraldComponent.CurrentTarget.position - transform.position).normalized * -EmeraldComponent.ReceivedRagdollForceAmount, ForceMode.Impulse);

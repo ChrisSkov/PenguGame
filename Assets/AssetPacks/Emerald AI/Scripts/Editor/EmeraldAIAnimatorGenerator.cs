@@ -1083,7 +1083,7 @@ namespace EmeraldAI.Utility
             CombatRunRightAnimation.objectReferenceValue = EmeraldComponent.CombatRunRightAnimation;
             CombatRunRightMirror.boolValue = EmeraldComponent.MirrorCombatRunRight;
 
-            if (EmeraldComponent.EnableBothWeaponTypes == EmeraldAISystem.YesOrNo.Yes || EmeraldComponent.WeaponTypeRef == EmeraldAISystem.WeaponType.Ranged)
+            if (EmeraldComponent.WeaponTypeRef == EmeraldAISystem.WeaponType.Both || EmeraldComponent.WeaponTypeRef == EmeraldAISystem.WeaponType.Ranged)
             {
                 ApplyRangedAnimations(EmeraldComponent);
             }

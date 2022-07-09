@@ -23,6 +23,7 @@ namespace EmeraldAI
         #region Variables
         public float ForceWalkDistance = 2.5f;
         public bool LockTurning;
+        public float MovementTurningSensitivity = 2f;
         //3.0 Variables
         public bool NotifiedOfNewVersion = false;
         float TimeSinceStart;
@@ -417,7 +418,8 @@ namespace EmeraldAI
         public Vector3 ProjectileDirection;
 
         public List<GameObject> potentialTargets = new List<GameObject>();
-        public List<Transform> LineOfSightTargets = new List<Transform>();
+        public List<Collider> LineOfSightTargets = new List<Collider>(); //3.1.2 Updated
+        //public List<Transform> LineOfSightTargets = new List<Transform>();
 
         [System.Serializable]
         public class InteractSoundClass
@@ -1399,7 +1401,7 @@ namespace EmeraldAI
             //Handles all of the AI's movement and speed calculations for Root Motion
             if (AIAgentActive)
             {
-                AIAnimator.SetFloat("Direction", angle, DirectionDampTime, Time.deltaTime);
+                AIAnimator.SetFloat("Direction", angle * MovementTurningSensitivity, DirectionDampTime, Time.deltaTime);
                 AlignAIMoving();
 
                 if (IsAttacking || IsEquipping || IsEmoting || m_NavMeshAgent.remainingDistance <= m_NavMeshAgent.stoppingDistance || IsBlocking || IsTurning)
@@ -1594,7 +1596,7 @@ namespace EmeraldAI
                     DestinationAdjustedAngle = Mathf.Abs(angle);
                 }
 
-                if (DestinationAdjustedAngle >= AngleToTurn && DestinationDirection != Vector3.zero && !RotateTowardsTarget && IsTurning)
+                if (DestinationAdjustedAngle >= AngleToTurn && DestinationDirection != Vector3.zero && !RotateTowardsTarget && IsTurning && !IsEmoting)
                 {
                     if (AlignAIWithGroundRef == YesOrNo.Yes)
                     {
@@ -1913,13 +1915,7 @@ namespace EmeraldAI
         /// </summary>
         void CreateEmeraldProjectile()
         {
-            if (m_EmeraldAIAbility == null)
-            {
-                Debug.LogError("There's a missing Ability Object in one of the Ability Objects slots of "+ gameObject.name +". Please go to AI's Settings>Combat>Damage Settings>Abilities and fill in any empty Ability Object slots.");
-                return;
-            }
-
-            if (CurrentTarget != null)
+            if (CurrentTarget != null && m_EmeraldAIAbility != null)
             {
                 float AdjustedAngle = TargetAngle();
 
@@ -2132,6 +2128,12 @@ namespace EmeraldAI
                     {
                         if (TargetTypeRef == TargetType.Player)
                         {
+                            //If the player attacks without being detected, add the EmeraldAIPlayerDamage script so it can receive damage.
+                            if (PlayerDamageComponent == null)
+                            {
+                                PlayerDamageComponent = CurrentTarget.gameObject.AddComponent<EmeraldAIPlayerDamage>();
+                            }
+
                             if (PlayerDamageComponent != null)
                             {
                                 PlayerDamageComponent.SendPlayerDamage(CurrentDamageAmount, this.transform, GetComponent<EmeraldAISystem>(), CriticalHit);
@@ -2401,7 +2403,6 @@ namespace EmeraldAI
                         }
                     }
 
-                    DamageEffectInhibitor = false;
                     EmeraldEventsManagerComponent.PlayInjuredSound();
 
                     if (CombatStateRef == CombatState.NotActive || ConfidenceRef == ConfidenceType.Coward)

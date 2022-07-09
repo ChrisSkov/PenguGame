@@ -7,6 +7,7 @@ public class AnimEvents : MonoBehaviour
 
     [SerializeField] GameObject fartCloud;
     [SerializeField] Transform effectSpawnTransform;
+    [SerializeField] PenguCombat combat;
     // Start is called before the first frame update
     void Start()
     {
@@ -24,5 +25,10 @@ public class AnimEvents : MonoBehaviour
     {
         GameObject clone = Instantiate(fartCloud, effectSpawnTransform.position, effectSpawnTransform.rotation);
         Destroy(clone, 0.5f);
+    }
+
+    public void BasicAttackAnimEvent()
+    {
+        combat.AttackAnimEvent();
     }
 }

@@ -62,12 +62,27 @@ namespace EmeraldAI.Utility
             FoldoutStyle.onActive.textColor = Color.black;
             FoldoutStyle.onFocused.textColor = Color.black;
             Color myStyleColor = Color.black;
-            
+
+            var HelpButtonStyle = new GUIStyle(GUI.skin.button);
+            HelpButtonStyle.normal.textColor = Color.white;
+            HelpButtonStyle.fontStyle = FontStyle.Bold;
+
             EditorGUILayout.Space();
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("The Location Based Damage component allows each collider to detect damage and apply a customizable damage multiplier based on the damage receieved. The hit effect that will play upon impact, " +
                 "and at the position the hit is detected, is based off of the AI's Hit Effects List (Located under AI's Settings>Combat>Hit Effect)", EditorStyles.helpBox);
-            EditorGUILayout.HelpBox("You can remove an undesired collider by selecting the collider within the Collider List and pressing the - button on the bottom of the Collider List area.", MessageType.Info);
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+
+            GUI.backgroundColor = new Color(1f, 1, 0.25f, 0.25f);
+            EditorGUILayout.HelpBox("For a tutorial on using the Location Based Damage component, please see the tutorial below. Note: The LBD uses different code to damage an AI.", MessageType.Info);
+            GUI.backgroundColor = new Color(0, 0.65f, 0, 0.8f);
+            if (GUILayout.Button("See Tutorial", HelpButtonStyle, GUILayout.Height(20)))
+            {
+                Application.OpenURL("https://github.com/Black-Horizon-Studios/Emerald-AI/wiki/Using-Location-Based-Damage#using-location-based-damage");
+            }
+            GUI.backgroundColor = Color.white;
+            EditorGUILayout.Space();
             EditorGUILayout.Space();
             EditorGUILayout.Space();
 
@@ -102,6 +117,8 @@ namespace EmeraldAI.Utility
                 self.ColliderList.Clear();
                 serializedObject.Update();
             }
+
+            EditorGUILayout.HelpBox("You can remove an undesired collider by selecting the collider within the Collider List and pressing the - button on the bottom of the Collider List area.", MessageType.Info);
 
             EditorGUILayout.Space();
             EditorGUILayout.Space();

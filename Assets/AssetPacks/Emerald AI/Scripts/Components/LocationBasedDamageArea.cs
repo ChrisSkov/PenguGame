@@ -16,6 +16,7 @@ namespace EmeraldAI
         /// </summary>
         public void DamageArea(int DamageAmount, EmeraldAISystem.TargetType? TypeOfTarget = null, Transform AttackerTransform = null, int RagdollForce = 0, bool CriticalHit = false)
         {
+            EmeraldComponent.DamageEffectInhibitor = true;
             DamageAmount = Mathf.RoundToInt(DamageAmount * DamageMultiplier);
             EmeraldComponent.Damage(DamageAmount, TypeOfTarget, AttackerTransform, RagdollForce, CriticalHit);
 
@@ -27,16 +28,22 @@ namespace EmeraldAI
         /// <summary>
         /// Creates an impact effect at the ImpactPosition. The Impact Effect is based off of your AI's Hit Effects List (Located under AI's Settings>Combat>Hit Effect).
         /// </summary>
-        public void CreateImpactEffect(Vector3 ImpactPosition)
+        public void CreateImpactEffect(Vector3 ImpactPosition, bool SetAIAsEffectParent = true)
         {
-            if (EmeraldComponent.UseHitEffect == EmeraldAISystem.YesOrNo.Yes && !EmeraldComponent.DamageEffectInhibitor && EmeraldComponent.BloodEffectsList.Count > 0)
+            if (EmeraldComponent.UseHitEffect == EmeraldAISystem.YesOrNo.Yes && EmeraldComponent.DamageEffectInhibitor && EmeraldComponent.BloodEffectsList.Count > 0)
             {
                 GameObject RandomBloodEffect = EmeraldComponent.BloodEffectsList[Random.Range(0, EmeraldComponent.BloodEffectsList.Count)];
                 if (RandomBloodEffect != null)
                 {
-                    GameObject SpawnedBlood = EmeraldAI.Utility.EmeraldAIObjectPool.SpawnEffect(RandomBloodEffect, ImpactPosition, transform.rotation, EmeraldComponent.BloodEffectTimeoutSeconds) as GameObject;
+                    GameObject SpawnedBlood = EmeraldAI.Utility.EmeraldAIObjectPool.SpawnEffect(RandomBloodEffect, ImpactPosition, Quaternion.LookRotation(transform.forward, Vector3.up), EmeraldComponent.BloodEffectTimeoutSeconds) as GameObject;
                     EmeraldComponent.LBDImpactPosition = ImpactPosition;
-                    SpawnedBlood.transform.SetParent(transform);
+
+                    if (SetAIAsEffectParent)
+                        SpawnedBlood.transform.SetParent(transform);
+                    else
+                        SpawnedBlood.transform.SetParent(EmeraldAISystem.ObjectPool.transform);
+
+                    EmeraldComponent.DamageEffectInhibitor = false;
                 }
             }
         }

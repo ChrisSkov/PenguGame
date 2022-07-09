@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using EmeraldAI.CharacterController;
 
-
 namespace EmeraldAI.Example
 {
     /// <summary>
@@ -41,7 +40,7 @@ namespace EmeraldAI.Example
             }
             float newHealth = CurrentHealth / StartingHealth;
             healthOrbImage.fillAmount = newHealth;
-            
+
         }
 
         public void PlayerDeath()

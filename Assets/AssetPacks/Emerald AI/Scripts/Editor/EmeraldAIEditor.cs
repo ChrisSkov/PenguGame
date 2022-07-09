@@ -49,7 +49,7 @@ namespace EmeraldAI.Utility
             NonCombatAngleToTurnProp, CombatAngleToTurnProp, MeleeAttackDistanceProp, InjuredVolumeProp, ImpactVolumeProp, EquipVolumeProp, UnequipVolumeProp, BloodEffectTimeoutSecondsProp,
             MeleeTooCloseDistanceProp, MitigationAmountProp, WarningVolumeProp, ProjectileCollisionPointYProp, RangedIdleCombatAnimationSpeedProp, DetectionFrequencyProp, AgentTurnSpeedMovingProp,
             RangedAttackDistanceProp, RangedTooCloseDistanceProp, RangedIdleWarningAnimationSpeedProp, RangedCombatTurnLeftAnimationSpeedProp, RangedCombatTurnRightAnimationSpeedProp,
-            RangedCombatWalkAnimationSpeedProp, RangedCombatRunAnimationSpeedProp, RangedEquipVolumeProp, RangedUnequipVolumeProp, MaxFiringAngleProp, AttackHeightProp;
+            RangedCombatWalkAnimationSpeedProp, RangedCombatRunAnimationSpeedProp, RangedEquipVolumeProp, RangedUnequipVolumeProp, MaxFiringAngleProp, AttackHeightProp, MovementTurningSensitivityProp;
 
         //enums
         SerializedProperty BehaviorProp, ConfidenceProp, RandomizeDamageProp, DetectionTypeProp, MaxChaseDistanceTypeProp, CombatTypeProp, CreateHealthBarsProp, UseCustomFontAINameProp, UseCustomFontAILevelProp,
@@ -398,6 +398,7 @@ namespace EmeraldAI.Utility
             DetectionFrequencyProp = serializedObject.FindProperty("DetectionFrequency");
             AttackHeightProp = serializedObject.FindProperty("AttackHeight");
             AINameLineSpacingProp = serializedObject.FindProperty("AINameLineSpacing");
+            MovementTurningSensitivityProp = serializedObject.FindProperty("MovementTurningSensitivity");
 
             //enums
             BehaviorProp = serializedObject.FindProperty("BehaviorRef");
@@ -3001,6 +3002,9 @@ namespace EmeraldAI.Utility
 
                     CustomEditorProperties.CustomIntSlider(new Rect(), new GUIContent(), BackupTurningSpeedProp, "Backup Turn Speed", 30, 300);
                     CustomHelpLabelField("Controls how fast your AI turns while backing up.", true);
+
+                    CustomEditorProperties.CustomFloatSlider(new Rect(), new GUIContent(), MovementTurningSensitivityProp, "Movement Turning Sensitivity", 0.5f, 3f);
+                    CustomHelpLabelField("Controls how sensitive the movement blend trees are when playing movement turning animations. This is especially noticeable for quadruped models with turning animations.", true);                   
 
                     EditorGUILayout.PropertyField(UseRandomRotationOnStartProp, new GUIContent("Random Roation on Start"));
                     CustomHelpLabelField("Controls whether or not AI will be randomly rotated on Start.", true);

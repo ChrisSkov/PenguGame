@@ -42,17 +42,13 @@ MonoBehaviour:
   DamageOvertimeTimeout: 3
   GravityAmount: 1
   AbilityIcon: {fileID: 0}
-  AbilityEffect: {fileID: 5407300729805292421, guid: 9b71c6aa054fabb4191cef3a2fe7ea14,
-    type: 3}
-  CreateEffect: {fileID: 5022461942033813024, guid: 9ca3edb2521ccdd4ebec6f75c05cc2c6,
-    type: 3}
+  AbilityEffect: {fileID: 5407300729805292421, guid: 9b71c6aa054fabb4191cef3a2fe7ea14, type: 3}
+  CreateEffect: {fileID: 5022461942033813024, guid: 9ca3edb2521ccdd4ebec6f75c05cc2c6, type: 3}
   SummonEffect: {fileID: 0}
   SummonObject: {fileID: 0}
-  DamageOverTimeEffect: {fileID: 1303674608091680, guid: 383e7d46bdb1daa4391f5ef6704a7bd4,
-    type: 3}
+  DamageOverTimeEffect: {fileID: 1303674608091680, guid: 383e7d46bdb1daa4391f5ef6704a7bd4, type: 3}
   DamageOverTimeSound: {fileID: 8300000, guid: ea9bc83b5650a1c449f196dbc7645090, type: 3}
-  CollisionEffect: {fileID: 5022461942033813024, guid: b91faebb38dbc6e499a8273a19149e2f,
-    type: 3}
+  CollisionEffect: {fileID: 5022461942033813024, guid: b91faebb38dbc6e499a8273a19149e2f, type: 3}
   CollisionSoundsList:
   - {fileID: 8300000, guid: 407b0b57a2c044dbd976c7f17cd08f77, type: 3}
   - {fileID: 8300000, guid: f98ed3bdb65044f0eaf7eb0938c6d1a6, type: 3}
@@ -77,4 +73,4 @@ MonoBehaviour:
   UseCriticalHits: 1
   UseCustomAbilityIcon: 0
   UseCreateEffect: 1
-  AbilityEditorTabs: 2
+  AbilityEditorTabs: 1

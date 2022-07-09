@@ -12,11 +12,12 @@ namespace EmeraldAI.Utility
     [System.Serializable]
     public class TargetPositionModifierEditor : Editor
     {
-        SerializedProperty PositionModifierProp, GizmoRadiusProp, GizmoColorProp;
+        SerializedProperty PositionModifierProp, PositionSourceProp, GizmoRadiusProp, GizmoColorProp;
 
         private void OnEnable()
         {            
             PositionModifierProp = serializedObject.FindProperty("PositionModifier");
+            PositionSourceProp = serializedObject.FindProperty("PositionSource");
             GizmoRadiusProp = serializedObject.FindProperty("GizmoRadius");
             GizmoColorProp = serializedObject.FindProperty("GizmoColor");
         }
@@ -32,11 +33,17 @@ namespace EmeraldAI.Utility
             GUI.backgroundColor = Color.white;
             EditorGUILayout.Space();
 
+            EditorGUILayout.LabelField("Controls the position source for the Target Position Modifier. For character controllers who's height can change, you will want to use Collider as this will automatically match the height of your character's collider with things like crouching and crawling.", EditorStyles.helpBox);
+            EditorGUILayout.PropertyField(PositionSourceProp, new GUIContent("Position Source"));
+            EditorGUILayout.Space();
+
             EditorGUILayout.LabelField("Controls the height of the position modifier.", EditorStyles.helpBox);
             CustomEditorProperties.CustomFloatSlider(new Rect(), new GUIContent(), PositionModifierProp, "Height Modifier", -5, 5);
+            EditorGUILayout.Space();
 
             EditorGUILayout.LabelField("Controls the radius of the sphere gizmo.", EditorStyles.helpBox);
             CustomEditorProperties.CustomFloatSlider(new Rect(), new GUIContent(), GizmoRadiusProp, "Gizmo Radius", 0.05f, 2.5f);
+            EditorGUILayout.Space();
 
             EditorGUILayout.LabelField("Controls the color of the sphere gizmo.", EditorStyles.helpBox);
             CustomEditorProperties.CustomColorField(new Rect(), new GUIContent(), GizmoColorProp, "Gizmo Color");

@@ -151,8 +151,8 @@ namespace EmeraldAI
             else
             {
                 //Remove the CurrentTarget from the AI's LineOfSightTargets list.
-                if (EmeraldComponent.LineOfSightTargets.Contains(EmeraldComponent.CurrentTarget))
-                    EmeraldComponent.LineOfSightTargets.Remove(EmeraldComponent.CurrentTarget);
+                if (EmeraldComponent.LineOfSightTargets.Contains(EmeraldComponent.CurrentTarget.GetComponent<Collider>()))
+                    EmeraldComponent.LineOfSightTargets.Remove(EmeraldComponent.CurrentTarget.GetComponent<Collider>());
 
                 EmeraldComponent.CurrentTarget = null; //Clears the current target
                 EmeraldComponent.TargetEmerald = null;

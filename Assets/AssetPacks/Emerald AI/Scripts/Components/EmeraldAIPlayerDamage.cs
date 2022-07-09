@@ -1,7 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using EmeraldAI.Example;
+
+#if SURVIVAL_TEMPLATE_PRO
+using SurvivalTemplatePro;
+#endif
 
 namespace EmeraldAI
 {
@@ -12,7 +15,8 @@ namespace EmeraldAI
     public class EmeraldAIPlayerDamage : MonoBehaviour
     {
         public List<string> ActiveEffects = new List<string>();
-        public bool IsDead = false;
+        public bool IsDead;
+
 
         public void SendPlayerDamage(int DamageAmount, Transform Target, EmeraldAISystem EmeraldComponent, bool CriticalHit = false)
         {
@@ -32,6 +36,11 @@ namespace EmeraldAI
 
             //Damage UFPS Player
             //DamageUFPSPlayer(DamageAmount);
+
+#if SURVIVAL_TEMPLATE_PRO
+            //Damage STP Player
+            DamageSTPPlayer(DamageAmount, Target);
+#endif
         }
 
         void DamagePlayerStandard(int DamageAmount)
@@ -47,6 +56,32 @@ namespace EmeraldAI
                 }
             }
         }
+
+        #region Survival Template PRO
+#if SURVIVAL_TEMPLATE_PRO
+        [Header("Survival Template PRO")]
+
+        [SerializeField, Range(0.01f, 10f)]
+        private float m_DamageMod = 1f;
+
+        private ICharacter m_Player;
+
+
+        void DamageSTPPlayer(int DamageAmount, Transform Target)
+        {
+            if (m_Player == null)
+                m_Player = GetComponentInParent<ICharacter>();
+
+            if (m_Player != null)
+            {
+                var dmgInfo = new DamageInfo(DamageAmount * m_DamageMod, DamageType.Hit, Target.position, Target.position - transform.position, 1f);
+                m_Player.HealthManager.ReceiveDamage(dmgInfo);
+
+                IsDead = !m_Player.HealthManager.IsAlive;
+            }
+        }
+#endif
+        #endregion
 
         /*
         void DamageRFPS(int DamageAmount, Transform Target)
