@@ -6,6 +6,7 @@ public class SwapToSideScroll : MonoBehaviour
 {
 
     [SerializeField] CinemachineVirtualCamera vCam;
+    [SerializeField] CinemachineFreeLook playerCam;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,6 +31,16 @@ public class SwapToSideScroll : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        SetPriorityUp();
+        if (other.gameObject.CompareTag("Player"))
+        {
+            playerCam.gameObject.SetActive(false);
+
+            foreach (GameObject virtualCam in GameObject.FindGameObjectsWithTag("CineCam"))
+            {
+                virtualCam.SetActive(false);
+            }
+
+            vCam.gameObject.SetActive(true);
+        }
     }
 }

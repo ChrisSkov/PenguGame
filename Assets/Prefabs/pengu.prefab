@@ -677,6 +677,7 @@ GameObject:
   - component: {fileID: 5588130178159516808}
   - component: {fileID: 5588130178159516809}
   - component: {fileID: 5588130178159516822}
+  - component: {fileID: 154055920}
   m_Layer: 7
   m_Name: pengu
   m_TagString: Emerald AI
@@ -702,7 +703,7 @@ Transform:
   - {fileID: 7562891588853019999}
   - {fileID: 1297957211750345216}
   m_Father: {fileID: 0}
-  m_RootOrder: 18
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: -105.299, z: 0}
 --- !u!114 &5588130178159516814
 MonoBehaviour:
@@ -746,7 +747,7 @@ MonoBehaviour:
     MinDamage: 5
     MaxDamage: 5
     AttackOdds: 1
-    AttackImpactEffect: {fileID: 0}
+    AttackImpactEffect: {fileID: 2427786012956944610, guid: da0de216ad60c5d46a6b049d61961615, type: 3}
   MeleeAttacksListIndex: 0
   MeleeRunAttackIndex: 0
   MeleeRunAttackPickType: 1
@@ -909,9 +910,9 @@ MonoBehaviour:
   AngleToTurn: 0
   NonCombatAngleToTurn: 20
   CombatAngleToTurn: 20
-  StationaryTurningSpeedNonCombat: 50
+  StationaryTurningSpeedNonCombat: 500
   MovingTurningSpeedNonCombat: 2000
-  StationaryTurningSpeedCombat: 50
+  StationaryTurningSpeedCombat: 249
   MovingTurningSpeedCombat: 2000
   BackupTurningSpeed: 100
   MaxSlopeLimit: 30
@@ -939,7 +940,19 @@ MonoBehaviour:
   WeaponTrail: {fileID: 0}
   DeathEvent:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 154055920}
+        m_TargetAssemblyTypeName: ShatterMe, Assembly-CSharp
+        m_MethodName: SpawnBloodAndGore
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   DamageEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -1011,7 +1024,7 @@ MonoBehaviour:
   StationaryIdleSeconds: 0
   StationaryIdleSecondsMin: 3
   StationaryIdleSecondsMax: 6
-  BloodEffectTimeoutSeconds: 3
+  BloodEffectTimeoutSeconds: 0.71
   BloodEffectsList:
   - {fileID: 1522849952582246208, guid: 30df76d1bd598654f94ccafd6b3bef9d, type: 3}
   CurrentProjectile: {fileID: 0}
@@ -1161,8 +1174,8 @@ MonoBehaviour:
   CurrentDamageAmount: 5
   DamageAmountRun: 5
   WanderRadius: 25
-  TabNumber: 4
-  TemperamentTabNumber: 2
+  TabNumber: 1
+  TemperamentTabNumber: 5
   DetectionTagsTabNumber: 1
   AnimationTabNumber: 2
   SoundTabNumber: 1
@@ -1173,9 +1186,9 @@ MonoBehaviour:
   AttackAnimationNumber: 1
   RunAttackAnimationNumber: 1
   IdleAnimationNumber: 1
-  CombatTabNumber: 2
+  CombatTabNumber: 0
   FactionsAndTagTabNumber: 1
-  EventTabNumber: 0
+  EventTabNumber: 1
   MinimumWaitTime: 3
   MaximumWaitTime: 6
   MinimumFollowWaitTime: 1
@@ -1768,6 +1781,21 @@ MonoBehaviour:
   DeathDelay: 0
   BoneObjects: 
   BoneTransformList: []
+--- !u!114 &154055920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5099999364460758573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d039f6d118016b347954da494fe1106c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  organs: {fileID: 0}
+  bloodVFX: {fileID: 0}
+  spawnPos: {fileID: 0}
 --- !u!1 &5201507082457950226
 GameObject:
   m_ObjectHideFlags: 0

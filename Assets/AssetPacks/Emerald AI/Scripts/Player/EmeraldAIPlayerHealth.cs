@@ -20,6 +20,8 @@ namespace EmeraldAI.Example
         public UnityEvent DeathEvent;
         public GameObject bloodPrefab;
         public Transform bloodPos;
+
+        public Text healthText;
         [HideInInspector]
         public float StartingHealth;
 
@@ -27,6 +29,7 @@ namespace EmeraldAI.Example
         {
             StartingHealth = CurrentHealth;
             healthOrbImage.fillAmount = StartingHealth;
+            UpdateHPText();
         }
 
         public void DamagePlayer(int DamageAmount)
@@ -52,6 +55,11 @@ namespace EmeraldAI.Example
         {
             GameObject clone = Instantiate(bloodPrefab, bloodPos.position, bloodPos.rotation);
             Destroy(clone, 0.4f);
+        }
+
+        public void UpdateHPText()
+        {
+            healthText.text = CurrentHealth.ToString() + "/" + StartingHealth.ToString();
         }
     }
 }
