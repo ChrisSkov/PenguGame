@@ -23,6 +23,6 @@ public class PickMeUp : MonoBehaviour
         if (!other.gameObject.CompareTag("Player"))
             return;
         onPickUp.Invoke();
-        Destroy(gameObject, 0.3f);
+        Destroy(transform.parent.gameObject, 0.3f);
     }
 }
